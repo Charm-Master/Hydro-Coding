@@ -67,34 +67,6 @@
             width: 100%;
         }
 
-        .leaderboard {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px 0;
-            background: #fff;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        table,
-        th,
-        td {
-            border: 1px solid #ccc;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: center;
-        }
-
         .contact-form {
             margin-top: 20px;
             background: #fff;
@@ -209,7 +181,6 @@
             margin: 10px 0;
             border-radius: 5px;
         }
-
     </style>
 </head>
 
@@ -218,10 +189,9 @@
         <h1>Open Source Coding Challenges</h1>
         <nav>
             <a href="#challenges">Challenges</a>
-            <a href="#leaderboard">Leaderboard</a>
             <a href="#contact">Contact</a>
             <a href="#profile">Profile</a>
-            <a href="#admin">Admin</a>
+            <a href="#admin" id="adminNav" style="display: none;">Admin</a>
         </nav>
     </header>
 
@@ -271,34 +241,6 @@
             </div>
         </section>
 
-        <section id="leaderboard">
-            <h2>Leaderboard</h2>
-            <div class="leaderboard">
-                <table>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Name</th>
-                        <th>Points</th>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>Alice</td>
-                        <td>150</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Bob</td>
-                        <td>120</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Charlie</td>
-                        <td>100</td>
-                    </tr>
-                </table>
-            </div>
-        </section>
-
         <section id="contact">
             <h2>Contact Us</h2>
             <div class="contact-form">
@@ -317,145 +259,118 @@
                 <div class="signin">
                     <button onclick="signInWithDiscord()">Sign in with Discord</button>
                 </div>
-                <h3 id="username">Username: Not Logged In</h3>
-                <h3 id="userId">User ID: Not Logged In</h3>
+                <h3>User Profile Information</h3>
+                <p id="userInfo" style="display: none;"></p>
+                <div id="userChallenges" style="display: none;"></div>
             </div>
         </section>
 
-        <section id="admin">
+        <section id="admin" style="display: none;">
             <h2>Admin Panel</h2>
             <div class="admin">
-                <h3>Pending Solutions for Approval</h3>
-                <table class="admin-table" id="pendingSolutions">
-                    <thead>
-                        <tr>
-                            <th>Challenge</th>
-                            <th>Solution</th>
-                            <th>Submitted By</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Pending solutions will be dynamically added here -->
-                    </tbody>
+                <h3>Pending Submissions</h3>
+                <table class="admin-table">
+                    <tr>
+                        <th>Challenge</th>
+                        <th>Submission</th>
+                        <th>Action</th>
+                    </tr>
+                    <tbody id="pendingSubmissions"></tbody>
                 </table>
             </div>
         </section>
     </div>
 
     <footer>
-        <p>&copy; 2024 Open Source Coding Challenges</p>
+        <p>Open Source Coding Challenges © 2024</p>
     </footer>
 
     <script>
-        let currentUser = null;
-        const pendingSubmissions = [];
+        let isAdmin = false; // Set this to true if the user is an admin
+        let userName = '';
+        let userPfp = ''; // Variable to store user's profile picture URL
+        const adminUserName = 'hydraulic_bolt_46520'; // Admin username
 
-        // Function to handle Discord sign-in
         function signInWithDiscord() {
-            const discordOAuthURL = `https://discord.com/api/oauth2/authorize?client_id=1298942705463722037&redirect_uri=https%3A%2F%2Fcharm-master.github.io%2FCharmify&response_type=token&scope=identify`;
-            window.location.href = discordOAuthURL;
+            // Simulate signing in and fetching user info
+            userName = adminUserName; // Replace with real user name
+            userPfp = 'https://example.com/path_to_user_pfp.jpg'; // Replace with actual user profile picture URL
+            isAdmin = true; // Simulating an admin for demo purposes
+
+            document.getElementById('userInfo').innerHTML = `Welcome, ${userName}!`;
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userChallenges').innerHTML = ''; // Clear any previous challenges
+            document.getElementById('userChallenges').style.display = 'none';
+
+            // Show admin panel if the user is an admin
+            if (isAdmin) {
+                document.getElementById('adminNav').style.display = 'block';
+                document.getElementById('admin').style.display = 'block';
+                fetchPendingSubmissions();
+            }
         }
 
-        // Simulated function to handle OAuth response and retrieve user data
-        window.onload = function () {
-            const hash = window.location.hash;
-            if (hash) {
-                const token = new URLSearchParams(hash.substr(1)).get('access_token');
-                if (token) {
-                    fetch('https://discord.com/api/users/@me', {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }).then(response => response.json())
-                        .then(data => {
-                            currentUser = data;
-                            document.getElementById('username').innerText = `Username: ${data.username}`;
-                            document.getElementById('userId').innerText = `User ID: ${data.id}`;
-                            localStorage.setItem('discordUser', JSON.stringify(data)); // Store user data
-                        });
-                }
-            } else {
-                const storedUser = localStorage.getItem('discordUser');
-                if (storedUser) {
-                    currentUser = JSON.parse(storedUser);
-                    document.getElementById('username').innerText = `Username: ${currentUser.username}`;
-                    document.getElementById('userId').innerText = `User ID: ${currentUser.id}`;
-                }
-            }
-        };
-
-        // Function to submit solution for a challenge
         function submitSolution(challenge, challengeId) {
-            const solutionText = document.getElementById(`solution${challengeId}`).value;
-            if (!currentUser) {
-                alert("You must be logged in to submit a solution!");
-                return;
-            }
-            if (solutionText.trim() === '') {
+            const solution = document.getElementById(`solution${challengeId}`).value;
+
+            if (!solution) {
                 alert("Please enter a solution before submitting.");
                 return;
             }
-            const submission = {
-                challenge: challenge,
-                solution: solutionText,
-                submittedBy: currentUser.username,
-                userId: currentUser.id,
-                approved: false
-            };
-            pendingSubmissions.push(submission); // Add to pending submissions
-            addPendingSubmissionToAdmin(submission); // Update admin panel
-            document.getElementById(`solution${challengeId}`).value = ''; // Clear the input field
-            alert("Your solution has been submitted for approval!");
-        }
 
-        // Function to add pending submission to the admin panel
-        function addPendingSubmissionToAdmin(submission) {
-            const tableBody = document.querySelector('#pendingSolutions tbody');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${submission.challenge}</td>
-                <td>${submission.solution}</td>
-                <td>${submission.submittedBy}</td>
-                <td>
-                    <button onclick="approveSolution('${submission.challenge}', '${submission.submittedBy}')">Approve</button>
-                    <button onclick="rejectSolution('${submission.challenge}', '${submission.submittedBy}')">Reject</button>
-                </td>
-            `;
-            tableBody.appendChild(newRow);
-        }
-
-        // Function to approve solution
-        function approveSolution(challenge, submittedBy) {
-            const index = pendingSubmissions.findIndex(sub => sub.challenge === challenge && sub.submittedBy === submittedBy);
-            if (index !== -1) {
-                const approvedSolution = pendingSubmissions[index];
-                approvedSolution.approved = true; // Mark as approved
-                displayApprovedSolution(approvedSolution);
-                pendingSubmissions.splice(index, 1); // Remove from pending
-                alert(`Approved solution by ${submittedBy} for ${challenge}`);
+            if (isAdmin) {
+                approveSolution(challengeId, solution);
+            } else {
+                alert("Please wait for admin approval.");
+                document.getElementById(`solution${challengeId}`).value = ''; // Clear the input
             }
         }
 
-        // Function to reject solution
-        function rejectSolution(challenge, submittedBy) {
-            const index = pendingSubmissions.findIndex(sub => sub.challenge === challenge && sub.submittedBy === submittedBy);
-            if (index !== -1) {
-                pendingSubmissions.splice(index, 1); // Remove from pending
-                alert(`Rejected solution by ${submittedBy} for ${challenge}`);
-            }
+        function approveSolution(challengeId, solution) {
+            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
+            const solutionDiv = document.createElement('div');
+            solutionDiv.classList.add('approved');
+            solutionDiv.innerHTML = `<strong>${userName}</strong> <img src="${userPfp}" alt="Profile Picture" style="width: 20px; height: 20px; border-radius: 50%;">: ${solution}`;
+            approvedSolutionsDiv.appendChild(solutionDiv);
+
+            // Clear the submission area
+            document.getElementById(`solution${challengeId}`).value = ''; // Clear the input
         }
 
-        // Function to display approved solutions under each challenge
-        function displayApprovedSolution(solution) {
-            const approvedDiv = document.getElementById(`approvedSolutions${solution.challenge.charAt(0)}`);
-            const solutionElement = document.createElement('div');
-            solutionElement.className = 'approved';
-            solutionElement.innerText = `${solution.submittedBy}: ${solution.solution}`;
-            approvedDiv.appendChild(solutionElement);
+        function fetchPendingSubmissions() {
+            // Sample pending submissions (for demonstration)
+            const submissions = [
+                { challenge: 'FizzBuzz', submission: 'function fizzBuzz() {...}' },
+                { challenge: 'Palindrome Checker', submission: 'function isPalindrome(str) {...}' },
+                { challenge: 'Factorial', submission: 'function factorial(n) {...}' }
+            ];
+
+            const pendingSubmissionsTable = document.getElementById('pendingSubmissions');
+            pendingSubmissionsTable.innerHTML = '';
+
+            submissions.forEach((submission, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${submission.challenge}</td>
+                    <td>${submission.submission}</td>
+                    <td>
+                        <button onclick="approveSubmission(${index})">Approve</button>
+                        <button onclick="rejectSubmission(${index})">Reject</button>
+                    </td>
+                `;
+                pendingSubmissionsTable.appendChild(row);
+            });
         }
 
+        function approveSubmission(index) {
+            alert(`Submission ${index + 1} approved.`);
+            // Here you can add more logic to handle the approval, e.g., updating a database
+        }
+
+        function rejectSubmission(index) {
+            alert(`Submission ${index + 1} rejected.`);
+            // Here you can add more logic to handle the rejection, e.g., updating a database
+        }
     </script>
 </body>
 
