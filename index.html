@@ -256,7 +256,7 @@
         <section id="profile">
             <h2>Your Profile</h2>
             <div class="profile">
-                <div class="signin" id="signin">
+                <div class="signin">
                     <button onclick="signInWithDiscord()">Sign in with Discord</button>
                 </div>
                 <h3>User Profile Information</h3>
@@ -295,75 +295,92 @@
 
         function signInWithDiscord() {
             // Redirect to Discord's OAuth2 authorization endpoint
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=identify%20email`;
         }
 
-        // Handle the OAuth2 response and extract the user information
-        window.onload = function () {
+        function submitSolution(challengeName, challengeId) {
+            const solutionTextarea = document.getElementById(`solution${challengeId}`);
+            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
+            const submission = solutionTextarea.value;
+
+            if (submission.trim() === '') {
+                alert('Please enter a solution before submitting.');
+                return;
+            }
+
+            // Display pending submission for admin approval
+            const pendingSubmissionsTable = document.getElementById('pendingSubmissions');
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${challengeName}</td><td>${submission}</td><td><button onclick="approveSubmission(this)">Approve</button><button onclick="rejectSubmission(this)">Reject</button></td>`;
+            pendingSubmissionsTable.appendChild(row);
+
+            // Clear textarea
+            solutionTextarea.value = '';
+        }
+
+        function approveSubmission(button) {
+            const row = button.parentElement.parentElement;
+            const submission = row.childNodes[1].textContent;
+            const challengeId = row.childNodes[0].textContent;
+
+            // Add approved submission to the approved solutions
+            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
+            const approvedMessage = document.createElement('div');
+            approvedMessage.classList.add('approved');
+            approvedMessage.textContent = submission;
+            approvedSolutionsDiv.appendChild(approvedMessage);
+
+            // Remove the row from the pending submissions table
+            row.remove();
+        }
+
+        function rejectSubmission(button) {
+            const row = button.parentElement.parentElement;
+            const submission = row.childNodes[1].textContent;
+            const challengeId = row.childNodes[0].textContent;
+
+            // Optionally, you can display a rejected message somewhere or log it
+            const rejectedMessage = document.createElement('div');
+            rejectedMessage.classList.add('rejected');
+            rejectedMessage.textContent = `Submission rejected: ${submission}`;
+            document.querySelector('#pendingSubmissions').appendChild(rejectedMessage);
+
+            // Remove the row from the pending submissions table
+            row.remove();
+        }
+
+        window.onload = () => {
             const hash = window.location.hash;
             if (hash) {
-                const token = hash.split('&')[0].split('=')[1];
-                fetch('https://discord.com/api/v10/users/@me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
+                const params = new URLSearchParams(hash.substring(1));
+                const accessToken = params.get('access_token');
+
+                if (accessToken) {
+                    fetch('https://discord.com/api/users/@me', {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    })
                     .then(response => response.json())
                     .then(data => {
                         userName = data.username;
                         userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
-                        document.getElementById('userInfo').innerHTML = `Logged in as ${userName} <img src="${userPfp}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;">`;
                         document.getElementById('userInfo').style.display = 'block';
+                        document.getElementById('userInfo').textContent = `Welcome, ${userName}!`;
+                        document.getElementById('profile').style.display = 'block';
 
+                        // Check if user is admin
                         if (userName === adminUserName) {
                             isAdmin = true;
-                            document.getElementById('adminNav').style.display = 'inline';
-                            document.getElementById('admin').style.display = 'block'; // Show the admin panel if logged in as admin
+                            document.getElementById('adminNav').style.display = 'block';
+                            document.getElementById('admin').style.display = 'block';
                         }
                     })
-                    .catch(console.error);
+                    .catch(error => {
+                        console.error('Error fetching user data:', error);
+                    });
+                }
             }
-        }
-
-        function submitSolution(challengeName, challengeId) {
-            const solution = document.getElementById(`solution${challengeId}`).value;
-            if (!solution) {
-                alert('Please enter a solution.');
-                return;
-            }
-
-            const submissionElement = document.createElement('div');
-            submissionElement.innerText = solution;
-
-            // Create the approve/reject buttons
-            const approveButton = document.createElement('button');
-            approveButton.innerText = 'Approve';
-            approveButton.onclick = () => approveSubmission(challengeId, submissionElement, true);
-
-            const rejectButton = document.createElement('button');
-            rejectButton.innerText = 'Reject';
-            rejectButton.onclick = () => approveSubmission(challengeId, submissionElement, false);
-
-            submissionElement.appendChild(approveButton);
-            submissionElement.appendChild(rejectButton);
-            submissionElement.className = 'pendingSubmission';
-            document.getElementById(`approvedSolutions${challengeId}`).appendChild(submissionElement);
-
-            // Clear the solution textarea after submission
-            document.getElementById(`solution${challengeId}`).value = '';
-        }
-
-        function approveSubmission(challengeId, submissionElement, isApproved) {
-            const statusMessage = document.createElement('div');
-            if (isApproved) {
-                statusMessage.innerText = 'Approved!';
-                statusMessage.className = 'approved';
-            } else {
-                statusMessage.innerText = 'Rejected!';
-                statusMessage.className = 'rejected';
-            }
-            submissionElement.appendChild(statusMessage);
-            submissionElement.querySelectorAll('button').forEach(button => button.disabled = true); // Disable buttons after action
         }
     </script>
 </body>
