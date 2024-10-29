@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -275,76 +275,78 @@
 
             // Create user info div
             const userInfoDiv = document.createElement('div');
-            userInfoDiv.className = 'approved';
-            userInfoDiv.innerHTML = `<strong>Approved:</strong> ${submission}`;
+            userInfoDiv.classList.add('approved');
+            userInfoDiv.innerHTML = 
+                `<div class="user-info">
+                    <img src="${userPfp}" alt="User Profile Picture">
+                    <span>${userName} submitted: "${submission}"</span>
+                    <span class="delete-btn" onclick="deleteSubmission(this)">❌</span>
+                </div>`;
 
             approvedSolutionsDiv.appendChild(userInfoDiv);
+
+            // Remove from pending submissions
             row.remove();
         }
 
         function rejectSubmission(button) {
             const row = button.parentElement.parentElement;
-            const submission = row.childNodes[1].textContent;
-            const challengeId = row.childNodes[0].textContent;
-            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
-
-            // Create rejection div
-            const rejectionDiv = document.createElement('div');
-            rejectionDiv.className = 'rejected';
-            rejectionDiv.innerHTML = `<strong>Rejected:</strong> ${submission}`;
-
-            approvedSolutionsDiv.appendChild(rejectionDiv);
             row.remove();
+            alert('Submission rejected.');
         }
 
-        // Function to handle the redirect from Discord and get user info
-        function handleDiscordResponse() {
-            const hash = window.location.hash;
+        function deleteSubmission(button) {
+            const userInfoDiv = button.parentElement.parentElement;
+            userInfoDiv.remove();
+        }
 
+        // OAuth token retrieval and user data fetching
+        window.onload = function() {
+            const hash = window.location.hash;
             if (hash) {
                 const token = hash.split('&')[0].split('=')[1];
-                fetch('https://discord.com/api/users/@me', {
+
+                // Fetch user information from Discord API
+                fetch('https://discord.com/api/v10/users/@me', {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`
                     }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        userName = data.username;
-                        userPfp = data.avatar ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` : '';
-                        isAdmin = userName === adminUserName;
+                .then(response => response.json())
+                .then(data => {
+                    userName = data.username; // Save username
+                    userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`; // Save profile picture URL
+                    document.getElementById('userInfo').innerText = `Signed in as: ${userName}`;
+                    document.getElementById('userInfo').style.display = 'block';
 
-                        document.getElementById('userInfo').style.display = 'block';
-                        document.getElementById('userInfo').innerHTML = `<div class="user-info"><img src="${userPfp}" alt="Profile Picture">${userName}</div>`;
-                        document.getElementById('userChallenges').style.display = 'block';
+                    // Display user profile picture
+                    const userProfilePic = document.createElement('img');
+                    userProfilePic.src = userPfp;
+                    userProfilePic.alt = 'User Avatar';
+                    userProfilePic.style.width = '50px';
+                    userProfilePic.style.borderRadius = '50%';
+                    document.getElementById('userChallenges').appendChild(userProfilePic);
+                    document.getElementById('userChallenges').style.display = 'block';
 
-                        if (isAdmin) {
-                            document.getElementById('adminNav').style.display = 'inline';
-                            document.getElementById('admin').style.display = 'block';
-                        } else {
-                            document.getElementById('adminNav').style.display = 'none';
-                            document.getElementById('admin').style.display = 'none';
-                        }
-                    })
-                    .catch(err => console.error(err));
+                    // Check if user is admin
+                    if (userName === adminUserName) {
+                        isAdmin = true;
+                        document.getElementById('adminNav').style.display = 'inline';
+                        document.getElementById('admin').style.display = 'block';
+                    }
+                })
+                .catch(err => console.error('Error fetching user data:', err));
             }
-        }
-
-        // Call the function to handle Discord response
-        handleDiscordResponse();
+        };
 
         function createChallenge() {
             const challengeName = prompt("Enter the challenge name:");
             const challengeDescription = prompt("Enter the challenge description:");
 
-            if (challengeName && challengeDescription) {
-                const newChallengeDiv = document.createElement('div');
-                newChallengeDiv.className = 'challenge';
-                newChallengeDiv.innerHTML = `<h3>${challengeName}</h3><p>${challengeDescription}</p><div class="submission"><h4>Submit Your Solution</h4><textarea placeholder="Enter your solution..."></textarea><button onclick="submitSolution('${challengeName}', challenges.length + 1)">Submit Solution</button></div>`;
-                document.getElementById('challenges').appendChild(newChallengeDiv);
-            } else {
-                alert("Both challenge name and description are required.");
-            }
+            const challengeDiv = document.createElement('div');
+            challengeDiv.classList.add('challenge');
+            challengeDiv.innerHTML = `<h3>${challengeName}</h3><p>${challengeDescription}</p>`;
+            document.getElementById('challenges').appendChild(challengeDiv);
         }
     </script>
 </body>
