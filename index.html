@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Source Coding Challenges</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        nav {
+            margin: 20px 0;
+        }
+
+        nav a {
+            margin: 0 15px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        h2 {
+            color: #007BFF;
+        }
+
+        .challenge {
+            background: #fff;
+            border: 1px solid #ccc;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .challenge h3 {
+            margin: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #007BFF;
+            color: #fff;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .leaderboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .contact-form {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .contact-form button {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .contact-form button:hover {
+            background: #0056b3;
+        }
+
+        .signin {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .signin button {
+            background: #7289DA;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .signin button:hover {
+            background: #5b6eae;
+        }
+
+        .profile {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+        }
+
+        .profile h3 {
+            margin-top: 0;
+        }
+
+        .submission {
+            margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .submission textarea {
+            width: 100%;
+            height: 60px;
+            margin-top: 10px;
+        }
+
+        .submission button {
+            margin-top: 10px;
+        }
+
+        .admin {
+            margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .admin h3 {
+            margin-top: 0;
+        }
+
+        .admin-table {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .approved {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Open Source Coding Challenges</h1>
+        <nav>
+            <a href="#challenges">Challenges</a>
+            <a href="#leaderboard">Leaderboard</a>
+            <a href="#contact">Contact</a>
+            <a href="#profile">Profile</a>
+            <a href="#admin">Admin</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <section id="challenges">
+            <h2>Coding Challenges</h2>
+
+            <div class="challenge">
+                <h3>Challenge 1: FizzBuzz</h3>
+                <p>Write a program that prints the numbers from 1 to 100. But for multiples of three print "Fizz"
+                    instead of the number and for the multiples of five print "Buzz". For numbers which are multiples
+                    of both three and five print "FizzBuzz".</p>
+                <div class="submission">
+                    <h4>Submit Your Solution</h4>
+                    <textarea id="solution1" placeholder="Enter your solution..."></textarea>
+                    <button onclick="submitSolution('FizzBuzz', 1)">Submit Solution</button>
+                </div>
+                <h4>Approved Solutions:</h4>
+                <div id="approvedSolutions1"></div>
+            </div>
+
+            <div class="challenge">
+                <h3>Challenge 2: Palindrome Checker</h3>
+                <p>Write a function that checks if a given string is a palindrome. A palindrome is a word, phrase,
+                    number, or other sequence of characters that reads the same forward and backward (ignoring spaces,
+                    punctuation, and capitalization).</p>
+                <div class="submission">
+                    <h4>Submit Your Solution</h4>
+                    <textarea id="solution2" placeholder="Enter your solution..."></textarea>
+                    <button onclick="submitSolution('Palindrome Checker', 2)">Submit Solution</button>
+                </div>
+                <h4>Approved Solutions:</h4>
+                <div id="approvedSolutions2"></div>
+            </div>
+
+            <div class="challenge">
+                <h3>Challenge 3: Factorial</h3>
+                <p>Write a function that returns the factorial of a number. The factorial of a non-negative integer n is
+                    the product of all positive integers less than or equal to n.</p>
+                <div class="submission">
+                    <h4>Submit Your Solution</h4>
+                    <textarea id="solution3" placeholder="Enter your solution..."></textarea>
+                    <button onclick="submitSolution('Factorial', 3)">Submit Solution</button>
+                </div>
+                <h4>Approved Solutions:</h4>
+                <div id="approvedSolutions3"></div>
+            </div>
+        </section>
+
+        <section id="leaderboard">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard">
+                <table>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Points</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Alice</td>
+                        <td>150</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Bob</td>
+                        <td>120</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Charlie</td>
+                        <td>100</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <div class="contact-form">
+                <form action="#">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="profile">
+            <h2>Your Profile</h2>
+            <div class="profile">
+                <div class="signin">
+                    <button onclick="signInWithDiscord()">Sign in with Discord</button>
+                </div>
+                <h3 id="username">Username: Not Logged In</h3>
+                <h3 id="userId">User ID: Not Logged In</h3>
+            </div>
+        </section>
+
+        <section id="admin">
+            <h2>Admin Panel</h2>
+            <div class="admin">
+                <h3>Pending Solutions for Approval</h3>
+                <table class="admin-table" id="pendingSolutions">
+                    <thead>
+                        <tr>
+                            <th>Challenge</th>
+                            <th>Solution</th>
+                            <th>Submitted By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Pending solutions will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Open Source Coding Challenges</p>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        const pendingSubmissions = [];
+
+        // Function to handle Discord sign-in
+        function signInWithDiscord() {
+            const discordOAuthURL = `https://discord.com/api/oauth2/authorize?client_id=1298942705463722037&redirect_uri=https%3A%2F%2Fcharm-master.github.io%2FCharmify&response_type=token&scope=identify`;
+            window.location.href = discordOAuthURL;
+        }
+
+        // Simulated function to handle OAuth response and retrieve user data
+        window.onload = function () {
+            const hash = window.location.hash;
+            if (hash) {
+                const token = new URLSearchParams(hash.substr(1)).get('access_token');
+                if (token) {
+                    fetch('https://discord.com/api/users/@me', {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }).then(response => response.json())
+                        .then(data => {
+                            currentUser = data;
+                            document.getElementById('username').innerText = `Username: ${data.username}`;
+                            document.getElementById('userId').innerText = `User ID: ${data.id}`;
+                            localStorage.setItem('discordUser', JSON.stringify(data)); // Store user data
+                        });
+                }
+            } else {
+                const storedUser = localStorage.getItem('discordUser');
+                if (storedUser) {
+                    currentUser = JSON.parse(storedUser);
+                    document.getElementById('username').innerText = `Username: ${currentUser.username}`;
+                    document.getElementById('userId').innerText = `User ID: ${currentUser.id}`;
+                }
+            }
+        };
+
+        // Function to submit solution for a challenge
+        function submitSolution(challenge, challengeId) {
+            const solutionText = document.getElementById(`solution${challengeId}`).value;
+            if (!currentUser) {
+                alert("You must be logged in to submit a solution!");
+                return;
+            }
+            if (solutionText.trim() === '') {
+                alert("Please enter a solution before submitting.");
+                return;
+            }
+            const submission = {
+                challenge: challenge,
+                solution: solutionText,
+                submittedBy: currentUser.username,
+                userId: currentUser.id,
+                approved: false
+            };
+            pendingSubmissions.push(submission); // Add to pending submissions
+            addPendingSubmissionToAdmin(submission); // Update admin panel
+            document.getElementById(`solution${challengeId}`).value = ''; // Clear the input field
+            alert("Your solution has been submitted for approval!");
+        }
+
+        // Function to add pending submission to the admin panel
+        function addPendingSubmissionToAdmin(submission) {
+            const tableBody = document.querySelector('#pendingSolutions tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${submission.challenge}</td>
+                <td>${submission.solution}</td>
+                <td>${submission.submittedBy}</td>
+                <td>
+                    <button onclick="approveSolution('${submission.challenge}', '${submission.submittedBy}')">Approve</button>
+                    <button onclick="rejectSolution('${submission.challenge}', '${submission.submittedBy}')">Reject</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        }
+
+        // Function to approve solution
+        function approveSolution(challenge, submittedBy) {
+            const index = pendingSubmissions.findIndex(sub => sub.challenge === challenge && sub.submittedBy === submittedBy);
+            if (index !== -1) {
+                const approvedSolution = pendingSubmissions[index];
+                approvedSolution.approved = true; // Mark as approved
+                displayApprovedSolution(approvedSolution);
+                pendingSubmissions.splice(index, 1); // Remove from pending
+                alert(`Approved solution by ${submittedBy} for ${challenge}`);
+            }
+        }
+
+        // Function to reject solution
+        function rejectSolution(challenge, submittedBy) {
+            const index = pendingSubmissions.findIndex(sub => sub.challenge === challenge && sub.submittedBy === submittedBy);
+            if (index !== -1) {
+                pendingSubmissions.splice(index, 1); // Remove from pending
+                alert(`Rejected solution by ${submittedBy} for ${challenge}`);
+            }
+        }
+
+        // Function to display approved solutions under each challenge
+        function displayApprovedSolution(solution) {
+            const approvedDiv = document.getElementById(`approvedSolutions${solution.challenge.charAt(0)}`);
+            const solutionElement = document.createElement('div');
+            solutionElement.className = 'approved';
+            solutionElement.innerText = `${solution.submittedBy}: ${solution.solution}`;
+            approvedDiv.appendChild(solutionElement);
+        }
+
+    </script>
+</body>
+
+</html>
