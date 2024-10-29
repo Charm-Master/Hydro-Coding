@@ -67,65 +67,6 @@
             width: 100%;
         }
 
-        .contact-form {
-            margin-top: 20px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-        }
-
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .contact-form button {
-            background: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .contact-form button:hover {
-            background: #0056b3;
-        }
-
-        .signin {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .signin button {
-            background: #7289DA;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .signin button:hover {
-            background: #5b6eae;
-        }
-
-        .profile {
-            margin: 20px 0;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-        }
-
-        .profile h3 {
-            margin-top: 0;
-        }
-
         .submission {
             margin-top: 20px;
             background: #fff;
@@ -181,6 +122,25 @@
             margin: 10px 0;
             border-radius: 5px;
         }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .user-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .delete-btn {
+            color: red;
+            cursor: pointer;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
@@ -189,7 +149,6 @@
         <h1>Open Source Coding Challenges</h1>
         <nav>
             <a href="#challenges">Challenges</a>
-            <a href="#contact">Contact</a>
             <a href="#profile">Profile</a>
             <a href="#admin" id="adminNav" style="display: none;">Admin</a>
         </nav>
@@ -241,18 +200,6 @@
             </div>
         </section>
 
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <div class="contact-form">
-                <form action="#">
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
-            </div>
-        </section>
-
         <section id="profile">
             <h2>Your Profile</h2>
             <div class="profile">
@@ -277,6 +224,8 @@
                     </tr>
                     <tbody id="pendingSubmissions"></tbody>
                 </table>
+                <h3>Manage Challenges</h3>
+                <button onclick="createChallenge()">Create Challenge</button>
             </div>
         </section>
     </div>
@@ -322,64 +271,85 @@
             const row = button.parentElement.parentElement;
             const submission = row.childNodes[1].textContent;
             const challengeId = row.childNodes[0].textContent;
-
-            // Add approved submission to the approved solutions
             const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
-            const approvedMessage = document.createElement('div');
-            approvedMessage.classList.add('approved');
-            approvedMessage.textContent = submission;
-            approvedSolutionsDiv.appendChild(approvedMessage);
 
-            // Remove the row from the pending submissions table
+            // Create user info div
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.classList.add('approved');
+            userInfoDiv.innerHTML = `
+                <div class="user-info">
+                    <img src="${userPfp}" alt="User Picture">
+                    <span>${userName}:</span>
+                    <span>${submission}</span>
+                    <span class="delete-btn" onclick="deleteSubmission(this)">X</span>
+                </div>
+            `;
+            approvedSolutionsDiv.appendChild(userInfoDiv);
+
+            // Remove pending submission from table
             row.remove();
         }
 
         function rejectSubmission(button) {
             const row = button.parentElement.parentElement;
-            const submission = row.childNodes[1].textContent;
-            const challengeId = row.childNodes[0].textContent;
-
-            // Optionally, you can display a rejected message somewhere or log it
-            const rejectedMessage = document.createElement('div');
-            rejectedMessage.classList.add('rejected');
-            rejectedMessage.textContent = `Submission rejected: ${submission}`;
-            document.querySelector('#pendingSubmissions').appendChild(rejectedMessage);
-
-            // Remove the row from the pending submissions table
-            row.remove();
+            row.remove(); // Remove the row from pending submissions
         }
 
-        window.onload = () => {
+        function deleteSubmission(button) {
+            const userInfoDiv = button.parentElement.parentElement;
+            userInfoDiv.remove(); // Remove the approved submission
+        }
+
+        function createChallenge() {
+            const challengeTitle = prompt("Enter challenge title:");
+            const challengeDescription = prompt("Enter challenge description:");
+
+            if (challengeTitle && challengeDescription) {
+                const challengeSection = document.createElement('div');
+                challengeSection.className = 'challenge';
+                challengeSection.innerHTML = `
+                    <h3>${challengeTitle}</h3>
+                    <p>${challengeDescription}</p>
+                    <div class="submission">
+                        <h4>Submit Your Solution</h4>
+                        <textarea placeholder="Enter your solution..."></textarea>
+                        <button onclick="submitSolution('${challengeTitle}', challenges.length + 1)">Submit Solution</button>
+                    </div>
+                    <h4>Approved Solutions:</h4>
+                    <div id="approvedSolutions${challenges.length + 1}"></div>
+                `;
+                document.getElementById('challenges').appendChild(challengeSection);
+            }
+        }
+
+        // Simulate Discord authentication and set user info
+        window.onload = function () {
             const hash = window.location.hash;
             if (hash) {
-                const params = new URLSearchParams(hash.substring(1));
-                const accessToken = params.get('access_token');
+                const token = hash.split('&')[0].split('=')[1];
 
-                if (accessToken) {
-                    fetch('https://discord.com/api/users/@me', {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        userName = data.username;
-                        userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
-                        document.getElementById('userInfo').style.display = 'block';
-                        document.getElementById('userInfo').textContent = `Welcome, ${userName}!`;
-                        document.getElementById('profile').style.display = 'block';
+                // Mock API request to get user info
+                fetch(`https://discord.com/api/users/@me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    userName = data.username;
+                    userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
+                    document.getElementById('userInfo').innerText = `Welcome, ${userName}!`;
+                    document.getElementById('userInfo').style.display = 'block';
+                    document.getElementById('userChallenges').innerText = `Your contributions will be displayed here.`;
+                    document.getElementById('userChallenges').style.display = 'block';
 
-                        // Check if user is admin
-                        if (userName === adminUserName) {
-                            isAdmin = true;
-                            document.getElementById('adminNav').style.display = 'block';
-                            document.getElementById('admin').style.display = 'block';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching user data:', error);
-                    });
-                }
+                    // Check if user is admin
+                    if (userName === adminUserName) {
+                        isAdmin = true;
+                        document.getElementById('adminNav').style.display = 'block';
+                        document.getElementById('admin').style.display = 'block';
+                    }
+                });
             }
         }
     </script>
