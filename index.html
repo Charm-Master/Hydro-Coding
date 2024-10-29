@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 
 <head>
@@ -275,65 +275,75 @@
 
             // Create user info div
             const userInfoDiv = document.createElement('div');
-            userInfoDiv.classList.add('approved');
-            userInfoDiv.innerHTML = `<strong>${userName}</strong>: ${submission} <span class="delete-btn" onclick="deleteSubmission(this)">🗑️</span>`;
-            approvedSolutionsDiv.appendChild(userInfoDiv);
+            userInfoDiv.className = 'approved';
+            userInfoDiv.innerHTML = `<strong>Approved:</strong> ${submission}`;
 
-            // Remove row from pending submissions
+            approvedSolutionsDiv.appendChild(userInfoDiv);
             row.remove();
         }
 
         function rejectSubmission(button) {
             const row = button.parentElement.parentElement;
+            const submission = row.childNodes[1].textContent;
+            const challengeId = row.childNodes[0].textContent;
+            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
+
+            // Create rejection div
+            const rejectionDiv = document.createElement('div');
+            rejectionDiv.className = 'rejected';
+            rejectionDiv.innerHTML = `<strong>Rejected:</strong> ${submission}`;
+
+            approvedSolutionsDiv.appendChild(rejectionDiv);
             row.remove();
         }
 
-        function deleteSubmission(button) {
-            const userInfoDiv = button.parentElement;
-            userInfoDiv.remove();
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
+        // Function to handle the redirect from Discord and get user info
+        function handleDiscordResponse() {
             const hash = window.location.hash;
+
             if (hash) {
                 const token = hash.split('&')[0].split('=')[1];
                 fetch('https://discord.com/api/users/@me', {
-                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        Authorization: `Bearer ${token}`
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    userName = data.username; // Get the username
-                    userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`; // Get the profile picture URL
-                    document.getElementById('userInfo').textContent = `Welcome, ${userName}!`;
-                    document.getElementById('userInfo').style.display = 'block';
-                    document.getElementById('userChallenges').textContent = `Your challenges will be displayed here, ${userName}.`;
-                    document.getElementById('userChallenges').style.display = 'block';
+                    .then(response => response.json())
+                    .then(data => {
+                        userName = data.username;
+                        userPfp = data.avatar ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` : '';
+                        isAdmin = userName === adminUserName;
 
-                    // Check if the user is an admin
-                    if (userName === adminUserName) {
-                        isAdmin = true;
-                        document.getElementById('adminNav').style.display = 'inline';
-                        document.getElementById('admin').style.display = 'block'; // Show admin panel
-                    }
-                    document.querySelector('.user-info').innerHTML = `<img src="${userPfp}" alt="User Profile Picture"> ${userName}`;
-                })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                });
+                        document.getElementById('userInfo').style.display = 'block';
+                        document.getElementById('userInfo').innerHTML = `<div class="user-info"><img src="${userPfp}" alt="Profile Picture">${userName}</div>`;
+                        document.getElementById('userChallenges').style.display = 'block';
+
+                        if (isAdmin) {
+                            document.getElementById('adminNav').style.display = 'inline';
+                            document.getElementById('admin').style.display = 'block';
+                        } else {
+                            document.getElementById('adminNav').style.display = 'none';
+                            document.getElementById('admin').style.display = 'none';
+                        }
+                    })
+                    .catch(err => console.error(err));
             }
-        });
+        }
+
+        // Call the function to handle Discord response
+        handleDiscordResponse();
 
         function createChallenge() {
-            const challengeName = prompt('Enter the challenge name:');
-            const challengeDescription = prompt('Enter the challenge description:');
+            const challengeName = prompt("Enter the challenge name:");
+            const challengeDescription = prompt("Enter the challenge description:");
+
             if (challengeName && challengeDescription) {
-                const challengeDiv = document.createElement('div');
-                challengeDiv.classList.add('challenge');
-                challengeDiv.innerHTML = `<h3>${challengeName}</h3><p>${challengeDescription}</p>`;
-                document.getElementById('challenges').appendChild(challengeDiv);
+                const newChallengeDiv = document.createElement('div');
+                newChallengeDiv.className = 'challenge';
+                newChallengeDiv.innerHTML = `<h3>${challengeName}</h3><p>${challengeDescription}</p><div class="submission"><h4>Submit Your Solution</h4><textarea placeholder="Enter your solution..."></textarea><button onclick="submitSolution('${challengeName}', challenges.length + 1)">Submit Solution</button></div>`;
+                document.getElementById('challenges').appendChild(newChallengeDiv);
+            } else {
+                alert("Both challenge name and description are required.");
             }
         }
     </script>
