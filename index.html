@@ -67,35 +67,6 @@
             width: 100%;
         }
 
-        .contact-form {
-            margin-top: 20px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-        }
-
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .contact-form button {
-            background: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .contact-form button:hover {
-            background: #0056b3;
-        }
-
         .signin {
             text-align: center;
             margin: 20px 0;
@@ -204,7 +175,6 @@
         <h1>Open Source Coding Challenges</h1>
         <nav>
             <a href="#challenges">Challenges</a>
-            <a href="#contact">Contact</a>
             <a href="#profile">Profile</a>
             <a href="#admin" id="adminNav" style="display: none;">Admin</a>
         </nav>
@@ -253,18 +223,6 @@
                 </div>
                 <h4>Approved Solutions:</h4>
                 <div id="approvedSolutions3"></div>
-            </div>
-        </section>
-
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <div class="contact-form">
-                <form action="#">
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
             </div>
         </section>
 
@@ -333,22 +291,10 @@
             const row = button.parentElement.parentElement;
             const submission = row.childNodes[1].textContent;
             const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
-
-            const approvedMessage = document.createElement('div');
-            approvedMessage.classList.add('approved');
-            approvedMessage.textContent = submission;
-
-            if (isAdmin) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.textContent = 'X';
-                deleteBtn.onclick = function () {
-                    approvedMessage.remove();
-                };
-                approvedMessage.appendChild(deleteBtn);
-            }
-
-            approvedSolutionsDiv.appendChild(approvedMessage);
+            const approvedRow = document.createElement('div');
+            approvedRow.className = 'approved';
+            approvedRow.innerHTML = submission + `<button class="delete-btn" onclick="deleteSubmission(this)">X</button>`;
+            approvedSolutionsDiv.appendChild(approvedRow);
             row.remove();
         }
 
@@ -357,10 +303,21 @@
             row.remove();
         }
 
-        window.onload = () => {
+        function deleteSubmission(button) {
+            const approvedRow = button.parentElement.parentElement;
+            approvedRow.remove();
+        }
+
+        function showAdminPanel() {
+            isAdmin = true;
+            document.getElementById('adminNav').style.display = 'block';
+            document.getElementById('admin').style.display = 'block';
+        }
+
+        window.onload = function () {
             const hash = window.location.hash;
             if (hash) {
-                const params = new URLSearchParams(hash.substring(1));
+                const params = new URLSearchParams(hash.slice(1));
                 const accessToken = params.get('access_token');
 
                 if (accessToken) {
@@ -373,22 +330,18 @@
                     .then(data => {
                         userName = data.username;
                         userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
+                        document.getElementById('userInfo').textContent = `Welcome, ${userName}`;
                         document.getElementById('userInfo').style.display = 'block';
-                        document.getElementById('userInfo').textContent = `Welcome, ${userName}!`;
-                        document.getElementById('profile').style.display = 'block';
-
+                        document.getElementById('userChallenges').innerHTML = `<p>Your Challenges:</p><ul><li>Challenge 1</li><li>Challenge 2</li><li>Challenge 3</li></ul>`;
+                        document.getElementById('userChallenges').style.display = 'block';
                         if (userName === adminUserName) {
-                            isAdmin = true;
-                            document.getElementById('adminNav').style.display = 'block';
-                            document.getElementById('admin').style.display = 'block';
+                            showAdminPanel();
                         }
                     })
-                    .catch(error => {
-                        console.error('Error fetching user data:', error);
-                    });
+                    .catch(err => console.error(err));
                 }
             }
-        }
+        };
     </script>
 </body>
 
