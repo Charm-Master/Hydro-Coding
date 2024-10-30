@@ -67,6 +67,65 @@
             width: 100%;
         }
 
+        .contact-form {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .contact-form button {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .contact-form button:hover {
+            background: #0056b3;
+        }
+
+        .signin {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .signin button {
+            background: #7289DA;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .signin button:hover {
+            background: #5b6eae;
+        }
+
+        .profile {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+        }
+
+        .profile h3 {
+            margin-top: 0;
+        }
+
         .submission {
             margin-top: 20px;
             background: #fff;
@@ -113,6 +172,21 @@
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
+            position: relative;
+        }
+
+        .delete-btn {
+            display: inline;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            font-size: 14px;
         }
 
         .rejected {
@@ -122,25 +196,6 @@
             margin: 10px 0;
             border-radius: 5px;
         }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .user-info img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .delete-btn {
-            color: red;
-            cursor: pointer;
-            margin-left: 10px;
-        }
     </style>
 </head>
 
@@ -149,6 +204,7 @@
         <h1>Open Source Coding Challenges</h1>
         <nav>
             <a href="#challenges">Challenges</a>
+            <a href="#contact">Contact</a>
             <a href="#profile">Profile</a>
             <a href="#admin" id="adminNav" style="display: none;">Admin</a>
         </nav>
@@ -200,6 +256,18 @@
             </div>
         </section>
 
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <div class="contact-form">
+                <form action="#">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </section>
+
         <section id="profile">
             <h2>Your Profile</h2>
             <div class="profile">
@@ -224,8 +292,6 @@
                     </tr>
                     <tbody id="pendingSubmissions"></tbody>
                 </table>
-                <h3>Manage Challenges</h3>
-                <button onclick="createChallenge()">Create Challenge</button>
             </div>
         </section>
     </div>
@@ -235,21 +301,19 @@
     </footer>
 
     <script>
-        const clientId = '1300918650026594335'; // Your Discord Client ID
-        const redirectUri = 'https://charm-master.github.io/Hydro-Coding'; // Your redirect URL
+        const clientId = '1300918650026594335';
+        const redirectUri = 'https://charm-master.github.io/Hydro-Coding';
         let isAdmin = false;
         let userName = '';
-        let userPfp = ''; // Variable to store user's profile picture URL
-        const adminUserName = 'hydraulic_bolt_46520'; // Admin username
+        let userPfp = '';
+        const adminUserName = 'hydraulic_bolt_46520';
 
         function signInWithDiscord() {
-            // Redirect to Discord's OAuth2 authorization endpoint
             window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=identify%20email`;
         }
 
         function submitSolution(challengeName, challengeId) {
             const solutionTextarea = document.getElementById(`solution${challengeId}`);
-            const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
             const submission = solutionTextarea.value;
 
             if (submission.trim() === '') {
@@ -257,96 +321,73 @@
                 return;
             }
 
-            // Display pending submission for admin approval
             const pendingSubmissionsTable = document.getElementById('pendingSubmissions');
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${challengeName}</td><td>${submission}</td><td><button onclick="approveSubmission(this)">Approve</button><button onclick="rejectSubmission(this)">Reject</button></td>`;
+            row.innerHTML = `<td>${challengeName}</td><td>${submission}</td><td><button onclick="approveSubmission(this, ${challengeId})">Approve</button><button onclick="rejectSubmission(this)">Reject</button></td>`;
             pendingSubmissionsTable.appendChild(row);
 
-            // Clear textarea
             solutionTextarea.value = '';
         }
 
-        function approveSubmission(button) {
+        function approveSubmission(button, challengeId) {
             const row = button.parentElement.parentElement;
             const submission = row.childNodes[1].textContent;
-            const challengeId = row.childNodes[0].textContent;
             const approvedSolutionsDiv = document.getElementById(`approvedSolutions${challengeId}`);
 
-            // Create user info div
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.classList.add('approved');
-            userInfoDiv.innerHTML = 
-                `<div class="user-info">
-                    <img src="${userPfp}" alt="User Profile Picture">
-                    <span>${userName} submitted: "${submission}"</span>
-                    <span class="delete-btn" onclick="deleteSubmission(this)">❌</span>
-                </div>`;
+            const approvedMessage = document.createElement('div');
+            approvedMessage.classList.add('approved');
+            approvedMessage.textContent = submission;
 
-            approvedSolutionsDiv.appendChild(userInfoDiv);
+            if (isAdmin) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.textContent = 'X';
+                deleteBtn.onclick = function () {
+                    approvedMessage.remove();
+                };
+                approvedMessage.appendChild(deleteBtn);
+            }
 
-            // Remove from pending submissions
+            approvedSolutionsDiv.appendChild(approvedMessage);
             row.remove();
         }
 
         function rejectSubmission(button) {
             const row = button.parentElement.parentElement;
             row.remove();
-            alert('Submission rejected.');
         }
 
-        function deleteSubmission(button) {
-            const userInfoDiv = button.parentElement.parentElement;
-            userInfoDiv.remove();
-        }
-
-        // OAuth token retrieval and user data fetching
-        window.onload = function() {
+        window.onload = () => {
             const hash = window.location.hash;
             if (hash) {
-                const token = hash.split('&')[0].split('=')[1];
+                const params = new URLSearchParams(hash.substring(1));
+                const accessToken = params.get('access_token');
 
-                // Fetch user information from Discord API
-                fetch('https://discord.com/api/v10/users/@me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    userName = data.username; // Save username
-                    userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`; // Save profile picture URL
-                    document.getElementById('userInfo').innerText = `Signed in as: ${userName}`;
-                    document.getElementById('userInfo').style.display = 'block';
+                if (accessToken) {
+                    fetch('https://discord.com/api/users/@me', {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        userName = data.username;
+                        userPfp = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`;
+                        document.getElementById('userInfo').style.display = 'block';
+                        document.getElementById('userInfo').textContent = `Welcome, ${userName}!`;
+                        document.getElementById('profile').style.display = 'block';
 
-                    // Display user profile picture
-                    const userProfilePic = document.createElement('img');
-                    userProfilePic.src = userPfp;
-                    userProfilePic.alt = 'User Avatar';
-                    userProfilePic.style.width = '50px';
-                    userProfilePic.style.borderRadius = '50%';
-                    document.getElementById('userChallenges').appendChild(userProfilePic);
-                    document.getElementById('userChallenges').style.display = 'block';
-
-                    // Check if user is admin
-                    if (userName === adminUserName) {
-                        isAdmin = true;
-                        document.getElementById('adminNav').style.display = 'inline';
-                        document.getElementById('admin').style.display = 'block';
-                    }
-                })
-                .catch(err => console.error('Error fetching user data:', err));
+                        if (userName === adminUserName) {
+                            isAdmin = true;
+                            document.getElementById('adminNav').style.display = 'block';
+                            document.getElementById('admin').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user data:', error);
+                    });
+                }
             }
-        };
-
-        function createChallenge() {
-            const challengeName = prompt("Enter the challenge name:");
-            const challengeDescription = prompt("Enter the challenge description:");
-
-            const challengeDiv = document.createElement('div');
-            challengeDiv.classList.add('challenge');
-            challengeDiv.innerHTML = `<h3>${challengeName}</h3><p>${challengeDescription}</p>`;
-            document.getElementById('challenges').appendChild(challengeDiv);
         }
     </script>
 </body>
